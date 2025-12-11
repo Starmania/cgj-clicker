@@ -14,6 +14,15 @@ import random
 
 import httpx
 
+HUMAN_CONSTANTS = {
+    "k": 100,
+    "t": 2.4,
+    "u": 2.8,
+    "a": 0,
+    "b": 100,
+    "min_to_drop": 100,
+}
+
 
 def is_night_time() -> bool:
     """Check if current time is between 00:00 and 06:00 UTC."""
@@ -30,8 +39,16 @@ def humaniser():
     """
     if is_night_time():
         return humaniser_night()
-    x = random.uniform(0, 113)
-    return 1.2 * (2.9**x + 1) / (math.exp(x) * 1.5)
+    k, t, u, a, b = (
+        HUMAN_CONSTANTS["k"],
+        HUMAN_CONSTANTS["t"],
+        HUMAN_CONSTANTS["u"],
+        HUMAN_CONSTANTS["a"],
+        HUMAN_CONSTANTS["b"],
+    )
+
+    x = random.uniform(a, b)
+    return k * (u**x + 1) / (math.exp(x) * t)
 
 
 def humaniser_night():
@@ -40,11 +57,20 @@ def humaniser_night():
     Returns:
         float: delay in seconds
     """
-    t = 0
-    while t < 120:
-        x = random.uniform(0, 113)
-        t = 1.2 * (2.9**x + 1) / (math.exp(x) * 1.5)
-    return t
+    k, t, u, a, b, min_to_drop = (
+        HUMAN_CONSTANTS["k"],
+        HUMAN_CONSTANTS["t"],
+        HUMAN_CONSTANTS["u"],
+        HUMAN_CONSTANTS["a"],
+        HUMAN_CONSTANTS["b"],
+        HUMAN_CONSTANTS["min_to_drop"],
+    )
+
+    l = 0
+    while l < min_to_drop:
+        x = random.uniform(a, b)
+        l = k * (u**x + 1) / (math.exp(x) * t)
+    return l
 
 
 def delta_to_date(date_str: str) -> timedelta:
@@ -130,7 +156,9 @@ class GameSession:
 
     async def __aenter__(self):
         """Async context manager entry."""
-        self.client = httpx.AsyncClient(follow_redirects=True, headers={"User-Agent": self.ua})
+        self.client = httpx.AsyncClient(
+            follow_redirects=True, headers={"User-Agent": self.ua}
+        )
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
