@@ -3,9 +3,10 @@ CLI interface for the Energy Game Bot.
 """
 
 import asyncio
-import click
 import sys
 from pathlib import Path
+
+import click
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))

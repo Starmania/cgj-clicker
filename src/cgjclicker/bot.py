@@ -4,12 +4,20 @@ Automates the clicking game at https://cgj.bpaul.fr/game/energy
 """
 
 import asyncio
-import httpx
-import re
 import json as json_module
-from typing import Optional
+import re
 from dataclasses import dataclass
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+import math
+import random
+
+import httpx
+
+
+def humaniser():
+    x = random.uniform(0, 113)
+    return 1.2 * (2.9**x + 1) / (math.exp(x) * 1.5)
 
 
 def delta_to_date(date_str: str) -> timedelta:
@@ -293,6 +301,10 @@ class EnergyBot:
                     server_wait_time: float = 0
                     if state and state.get("next_click_in_seconds"):
                         server_wait_time = max(0, state["next_click_in_seconds"])
+
+                    human_delay = humaniser()
+                    print(f"Humanizer delay: {human_delay:.2f}s")
+                    server_wait_time += human_delay
 
                     # Determine wait time: use maximum of configured interval and server timeout
                     wait_time: float = server_wait_time
