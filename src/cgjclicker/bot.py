@@ -11,7 +11,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 import math
 import random
-from datetime import datetime, timedelta
 
 import httpx
 
@@ -125,10 +124,13 @@ class GameSession:
     base_url: str = "https://cgj.bpaul.fr"
     cookies: Optional[httpx.Cookies] = None
     client: Optional[httpx.AsyncClient] = None
+    ua = (
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:145.0) Gecko/20100101 Firefox/145.0"
+    )
 
     async def __aenter__(self):
         """Async context manager entry."""
-        self.client = httpx.AsyncClient(follow_redirects=True)
+        self.client = httpx.AsyncClient(follow_redirects=True, headers={"User-Agent": self.ua})
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
