@@ -11,13 +11,41 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 import math
 import random
+from datetime import datetime, timedelta
 
 import httpx
 
 
+def is_night_time() -> bool:
+    """Check if current time is between 00:00 and 06:00 UTC."""
+    now_utc = datetime.now()
+    hour = now_utc.hour
+    return hour < 6
+
+
 def humaniser():
+    """Get an human delay that respect day/night cycle
+
+    Returns:
+        float: delay in seconds
+    """
+    if is_night_time():
+        return humaniser_night()
     x = random.uniform(0, 113)
     return 1.2 * (2.9**x + 1) / (math.exp(x) * 1.5)
+
+
+def humaniser_night():
+    """Get an human delay that respect night
+
+    Returns:
+        float: delay in seconds
+    """
+    t = 0
+    while t < 120:
+        x = random.uniform(0, 113)
+        t = 1.2 * (2.9**x + 1) / (math.exp(x) * 1.5)
+    return t
 
 
 def delta_to_date(date_str: str) -> timedelta:
